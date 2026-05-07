@@ -1,8 +1,13 @@
 numpy
 pandas
 matplotlib
+seaborn
 scikit-learn
+tensorflow
 opencv-python
 Pillow
 jupyter
 notebook
+kagglehub
+imbalanced-learn
+tqdm
