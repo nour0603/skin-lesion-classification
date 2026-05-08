@@ -326,12 +326,26 @@ def compare_baselines(df: pd.DataFrame, max_images: int = 1000) -> pd.DataFrame:
 
 def main() -> None:
     """
-    CLI placeholder.
+    Train from the command line.
 
-    Example:
-        python src/train.py data/processed/index_balanced_skin_lesions.csv
+    Usage:
+        python -m src.train <index_csv> [--binary] [--epochs N]
     """
-    print("Use train_multiclass(...) or train_binary(...) with a prepared index CSV.")
+    import sys
+
+    args = sys.argv[1:]
+    if not args:
+        print("Usage: python -m src.train <index_csv> [--binary] [--epochs N]")
+        sys.exit(1)
+
+    index_csv = args[0]
+    binary = "--binary" in args
+    epochs = int(args[args.index("--epochs") + 1]) if "--epochs" in args else 10
+
+    if binary:
+        train_binary(index_csv, epochs=epochs)
+    else:
+        train_multiclass(index_csv, epochs=epochs)
 
 
 if __name__ == "__main__":

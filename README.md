@@ -159,16 +159,8 @@ The reusable modules in `src/` support dataset preparation, preprocessing, train
 
 The key report findings are summarised in [`reports/model_results.md`](reports/model_results.md).
 
-## Current Status
-
-This repository has been refactored from the original notebook workflow into reusable Python modules, with project results documented in a dedicated report summary.
-
 ## Future Improvements
 
-- Deploy a web or mobile application where users can upload lesion photos and receive top-3 lesion predictions with a malignant-vs-benign risk score
-- Add clear user-facing safety messaging, encouraging medical review rather than self-diagnosis
-- Add Grad-CAM explainability visualisations to show which image regions influenced model predictions
-- Add automated tests for preprocessing and prediction utilities
-- Add model performance figures to `reports/figures/`
-- Add a trained-model card explaining data limitations, intended use, and ethical considerations
-- Improve melanoma recall in the seven-class classifier using additional diverse datasets
+- Deploy a web application where users can upload a lesion image and receive top-3 predictions with a malignant-vs-benign risk score and safety messaging encouraging medical review
+- Add Grad-CAM explainability visualisations to highlight which image regions influenced model predictions
+- Add a model card documenting training data, intended use, limitations, and ethical considerations

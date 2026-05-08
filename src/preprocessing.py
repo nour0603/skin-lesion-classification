@@ -8,8 +8,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.applications.efficientnet import preprocess_input
 
 try:
     from .config import IMG_SIZE
@@ -37,14 +35,19 @@ def load_image_cv2(
     if not path.exists():
         raise FileNotFoundError(f"Image not found: {path}")
 
-    target_size = (image_size, image_size) if isinstance(image_size, int) else image_size
+    # cv2.resize expects (width, height); image_size is (height, width) or a square int.
+    if isinstance(image_size, int):
+        cv2_size = (image_size, image_size)
+    else:
+        height, width = image_size
+        cv2_size = (width, height)
 
     image = cv2.imread(str(path))
     if image is None:
         raise FileNotFoundError(f"Could not read image: {path}")
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+    image = cv2.resize(image, cv2_size, interpolation=cv2.INTER_AREA)
 
     if scale_to_unit_range:
         image = image.astype("float32") / 255.0
@@ -54,10 +57,10 @@ def load_image_cv2(
 
 def random_augment_numpy(image: np.ndarray) -> np.ndarray:
     """
-    Apply lightweight random augmentation used in the original notebook.
+    Lightweight augmentation for non-TF workflows (e.g. quick experiments).
 
-    The augmentation is intentionally simple so it can be used for quick
-    experiments without requiring a full Keras augmentation pipeline.
+    Not called in the standard training pipeline — make_tf_dataset uses
+    make_keras_augmentation instead. Available via preprocess_image(path, augment=True).
     """
     out = image.copy()
 
@@ -88,10 +91,12 @@ def preprocess_image(
     return image
 
 
-def make_keras_augmentation(seed: int = 42) -> tf.keras.Sequential:
+def make_keras_augmentation(seed: int = 42):
     """
     Build the Keras augmentation pipeline used before EfficientNetB0.
     """
+    import tensorflow as tf
+
     return tf.keras.Sequential(
         [
             tf.keras.layers.RandomFlip("horizontal", seed=seed),
@@ -103,10 +108,13 @@ def make_keras_augmentation(seed: int = 42) -> tf.keras.Sequential:
     )
 
 
-def load_for_efficientnet(path: tf.Tensor, image_size: int = IMG_SIZE) -> tf.Tensor:
+def load_for_efficientnet(path, image_size: int = IMG_SIZE):
     """
     Read an image path tensor and preprocess it for EfficientNetB0.
     """
+    import tensorflow as tf
+    from tensorflow.keras.applications.efficientnet import preprocess_input
+
     image = tf.io.read_file(path)
     image = tf.image.decode_jpeg(image, channels=3)
     image = tf.image.resize(image, (image_size, image_size))
@@ -122,14 +130,20 @@ def make_tf_dataset(
     training: bool = False,
     one_hot_classes: int | None = None,
     seed: int = 42,
-) -> tf.data.Dataset:
+):
     """
     Build a `tf.data.Dataset` from image paths and labels.
     """
+    import tensorflow as tf
+
+    augmentation = make_keras_augmentation(seed=seed) if training else None
+
     dataset = tf.data.Dataset.from_tensor_slices((list(paths), labels))
 
     def _parse(path, label):
         image = load_for_efficientnet(path, image_size=image_size)
+        if augmentation is not None:
+            image = augmentation(image, training=True)
         if one_hot_classes is not None:
             label_out = tf.one_hot(tf.cast(label, tf.int32), one_hot_classes)
         else:

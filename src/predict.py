@@ -10,10 +10,10 @@ import numpy as np
 import tensorflow as tf
 
 try:
-    from .config import IMG_SIZE
+    from .config import BATCH_SIZE, IMG_SIZE
     from .preprocessing import load_for_efficientnet
 except ImportError:
-    from config import IMG_SIZE
+    from config import BATCH_SIZE, IMG_SIZE
     from preprocessing import load_for_efficientnet
 
 
@@ -80,25 +80,33 @@ def predict_malignancy_batch(
     image_paths: list[str | Path],
     model: tf.keras.Model,
     threshold: float = 0.5,
+    batch_size: int = BATCH_SIZE,
 ) -> list[dict[str, float | str]]:
     """
-    Predict malignant-vs-benign risk for several images.
+    Predict malignant-vs-benign risk for several images in one batched pass.
     """
+    if not image_paths:
+        return []
+
+    path_ds = tf.data.Dataset.from_tensor_slices([str(p) for p in image_paths])
+    image_ds = (
+        path_ds
+        .map(
+            lambda p: load_for_efficientnet(p, image_size=IMG_SIZE),
+            num_parallel_calls=tf.data.AUTOTUNE,
+        )
+        .batch(batch_size)
+        .prefetch(tf.data.AUTOTUNE)
+    )
+
+    probabilities = model.predict(image_ds, verbose=0).ravel()
+
     return [
         {
             "image_path": str(path),
-            **predict_malignancy(path, model, threshold=threshold),
+            "malignant_probability": float(prob),
+            "threshold": float(threshold),
+            "predicted_label": "malignant" if prob >= threshold else "benign",
         }
-        for path in image_paths
+        for path, prob in zip(image_paths, probabilities)
     ]
-
-
-def main() -> None:
-    """
-    CLI placeholder for future demonstration use.
-    """
-    print("Load a trained model, then call predict_topk(...) or predict_malignancy(...).")
-
-
-if __name__ == "__main__":
-    main()
