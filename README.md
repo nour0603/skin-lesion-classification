@@ -19,7 +19,7 @@ The goal is not to build a deployable medical product, but to demonstrate a care
 
 ## Project Overview
 
-The current notebook workflow includes:
+The current workflow includes:
 
 - Dataset acquisition using KaggleHub
 - ISIC 2019 and HAM10000-style dataset preprocessing
@@ -32,8 +32,27 @@ The current notebook workflow includes:
 - EfficientNetB0 transfer learning for seven-class classification
 - Binary malignant-vs-benign classification
 - Threshold selection with recall sensitivity in mind
-- Confusion matrix, F1-score, classification report, and ROC-AUC evaluation
-- Top-3 prediction visualisation
+- Confusion matrix, F1-score, classification report, ROC-AUC, and top-3 accuracy evaluation
+
+## Results Summary
+
+Detailed results are available in [`reports/model_results.md`](reports/model_results.md).
+
+### Subproblem A: Seven-Class Classification
+
+| Model | Top-1 Accuracy | Top-3 Accuracy | Macro-F1 | Macro-AUC |
+|---|---:|---:|---:|---:|
+| EfficientNetB0 CNN | 78.7% | 97-98% | 0.65 | 0.95 |
+
+The top-3 output is especially useful because it gives a shortlist of likely lesion types rather than forcing a single overconfident prediction.
+
+### Subproblem B: Binary Malignancy Classification
+
+| Model | ROC-AUC | Accuracy | Malignant Recall | Precision | NPV |
+|---|---:|---:|---:|---:|---:|
+| EfficientNetB0 CNN | 0.89-0.91 | 71-73% | 0.94-0.95 | 0.49 | 0.97 |
+
+The binary classifier uses a safety-first threshold that prioritises high malignant recall. This intentionally increases false positives to reduce false negatives, which is more appropriate for a screening-oriented medical context.
 
 ## Tech Stack
 
@@ -45,7 +64,7 @@ The current notebook workflow includes:
 - NumPy / Pandas
 - Matplotlib / Seaborn
 - KaggleHub
-- Jupyter Notebook
+- Jupyter Notebook / Google Colab
 
 ## Repository Structure
 
@@ -54,8 +73,11 @@ skin-lesion-classification/
 ├── data/                 # Dataset instructions only; raw data is not committed
 ├── notebooks/            # Jupyter notebooks for experiments and analysis
 ├── reports/              # Final report and generated figures
+│   ├── model_results.md  # Summary of evaluation results
 │   └── figures/          # Evaluation plots, confusion matrices, etc.
 ├── src/                  # Reusable Python source code
+│   ├── config.py
+│   ├── data.py
 │   ├── preprocessing.py
 │   ├── train.py
 │   ├── evaluate.py
@@ -125,28 +147,34 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-The original workflow was developed in a notebook/Colab environment. After the project notebook is added, run it from the `notebooks/` folder.
+Prepare the dataset index:
+
+```bash
+python src/data.py
+```
+
+The training utilities can then be called from `src/train.py` using the prepared CSV index.
 
 ## Report
 
-A written project report can be added under:
+The key report findings are summarised in [`reports/model_results.md`](reports/model_results.md).
+
+The full written report can be added manually as:
 
 ```text
 reports/final-report.pdf
 ```
 
-Once added, this README can link to it directly.
-
 ## Current Status
 
-This repository is being prepared as a polished portfolio project. The starter structure is complete, and the next step is to add the cleaned notebook, final report, and result figures.
+This repository has been refactored from the original notebook workflow into reusable Python modules. The next steps are to add final figures, optional tests, and the full report PDF.
 
 ## Future Improvements
 
-- Add the cleaned experiment notebook
-- Add model performance results and figures
-- Convert notebook cells into reusable training and evaluation scripts
+- Add the full written report PDF
+- Add model performance figures to `reports/figures/`
 - Add automated tests for preprocessing utilities
 - Add a trained-model card explaining limitations
 - Add clearer comparison between baseline and EfficientNetB0 models
-- Add a lightweight prediction script for demonstration purposes
+- Add a lightweight prediction demo
+- Add Grad-CAM explainability visualisations
