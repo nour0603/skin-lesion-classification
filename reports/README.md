@@ -1,13 +1,5 @@
 # Reports
 
-This folder contains the written report and supporting materials for the project.
+This folder contains result summaries and supporting analysis for the project.
 
-Suggested files:
-
-```text
-reports/
-├── final-report.pdf
-└── figures/
-```
-
-Figures may include class distribution charts, confusion matrices, training curves, and evaluation plots.
+The main evaluation summary is available in `model_results.md`. Generated evaluation figures belong in `reports/figures/`.
