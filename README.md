@@ -15,11 +15,11 @@ The workflow uses TensorFlow/Keras, EfficientNetB0 transfer learning, image prep
 
 Melanoma is a serious form of skin cancer where early detection can significantly affect outcomes. This project explores how machine learning models can be trained on dermoscopic image datasets to classify skin lesions and evaluate malignancy-related risk signals.
 
-The goal is not to build a deployable medical product, but to demonstrate a careful machine learning workflow involving image preprocessing, model evaluation, class imbalance awareness, and discussion of limitations.
+The goal is not to build a deployable medical product, but to demonstrate a careful machine learning workflow involving image preprocessing, model evaluation, class imbalance awareness, and responsible discussion of limitations.
 
 ## Project Overview
 
-The current workflow includes:
+The workflow includes:
 
 - Dataset acquisition using KaggleHub
 - ISIC 2019 and HAM10000-style dataset preprocessing
@@ -70,11 +70,11 @@ The binary classifier uses a safety-first threshold that prioritises high malign
 
 ```text
 skin-lesion-classification/
-├── data/                 # Dataset instructions only; raw data is not committed
-├── notebooks/            # Jupyter notebooks for experiments and analysis
-├── reports/              # Final report and generated figures
-│   ├── model_results.md  # Summary of evaluation results
-│   └── figures/          # Evaluation plots, confusion matrices, etc.
+├── data/                 # Dataset documentation
+├── notebooks/            # Experiment notebooks
+├── reports/              # Results and supporting analysis
+│   ├── model_results.md
+│   └── figures/
 ├── src/                  # Reusable Python source code
 │   ├── config.py
 │   ├── data.py
@@ -82,7 +82,7 @@ skin-lesion-classification/
 │   ├── train.py
 │   ├── evaluate.py
 │   └── predict.py
-├── tests/                # Test files and testing notes
+├── tests/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -95,11 +95,11 @@ This project is designed around public dermoscopic skin lesion datasets, includi
 - ISIC 2019-style dermoscopic image data
 - HAM10000 / ISIC 2018-style dermoscopic image data
 
-Large datasets and medical images are not included in this repository. See [`data/README.md`](data/README.md) for instructions on how dataset files should be organised locally.
+Large datasets and medical images are not included in this repository. The dataset folder documents the expected local data layout and the project's approach to keeping raw medical images out of version control.
 
 ## Methodology
 
-The intended workflow is:
+The workflow is:
 
 1. Load dermoscopic image metadata and image files.
 2. Convert labels into a consistent set of readable skin lesion classes.
@@ -153,28 +153,22 @@ Prepare the dataset index:
 python src/data.py
 ```
 
-The training utilities can then be called from `src/train.py` using the prepared CSV index.
+The reusable modules in `src/` support dataset preparation, preprocessing, training, evaluation, and prediction workflows.
 
 ## Report
 
 The key report findings are summarised in [`reports/model_results.md`](reports/model_results.md).
 
-The full written report can be added manually as:
-
-```text
-reports/final-report.pdf
-```
-
 ## Current Status
 
-This repository has been refactored from the original notebook workflow into reusable Python modules. The next steps are to add final figures, optional tests, and the full report PDF.
+This repository has been refactored from the original notebook workflow into reusable Python modules, with project results documented in a dedicated report summary.
 
 ## Future Improvements
 
-- Add the full written report PDF
+- Deploy a web or mobile application where users can upload lesion photos and receive top-3 lesion predictions with a malignant-vs-benign risk score
+- Add clear user-facing safety messaging, encouraging medical review rather than self-diagnosis
+- Add Grad-CAM explainability visualisations to show which image regions influenced model predictions
+- Add automated tests for preprocessing and prediction utilities
 - Add model performance figures to `reports/figures/`
-- Add automated tests for preprocessing utilities
-- Add a trained-model card explaining limitations
-- Add clearer comparison between baseline and EfficientNetB0 models
-- Add a lightweight prediction demo
-- Add Grad-CAM explainability visualisations
+- Add a trained-model card explaining data limitations, intended use, and ethical considerations
+- Improve melanoma recall in the seven-class classifier using additional diverse datasets
