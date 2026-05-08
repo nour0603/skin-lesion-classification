@@ -2,9 +2,9 @@
 
 Raw datasets and medical images are not committed to this repository.
 
-This folder is intended to store local dataset files during development.
+This project uses public dermoscopic image datasets, including ISIC 2019-style data and HAM10000 / ISIC 2018-style data. Dataset acquisition and preprocessing are handled through the reusable pipeline in `src/data.py`.
 
-Suggested local structure:
+The local data directory is organised into raw and processed files:
 
 ```text
 data/
@@ -12,8 +12,7 @@ data/
 │   ├── images/
 │   └── metadata.csv
 └── processed/
+    └── index_balanced_skin_lesions.csv
 ```
 
-Use publicly available dermoscopic image datasets such as HAM10000 or ISIC-style datasets where appropriate.
-
-Do not commit large image files, private medical data, or downloaded datasets directly to GitHub.
+Keeping raw medical images out of version control helps avoid large repository files and supports responsible handling of medical image data.
