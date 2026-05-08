@@ -1,18 +1,9 @@
 # Data
 
-Raw datasets and medical images are not committed to this repository.
+Raw datasets, downloaded medical images, and generated processed data are not committed to this repository.
 
 This project uses public dermoscopic image datasets, including ISIC 2019-style data and HAM10000 / ISIC 2018-style data. Dataset acquisition and preprocessing are handled through the reusable pipeline in `src/data.py`.
 
-The local data directory is organised into raw and processed files:
+The pipeline uses KaggleHub to download the datasets locally, resolves the dataset-specific directory structures, standardises labels, combines metadata, applies balancing, and generates a processed index file for training and evaluation.
 
-```text
-data/
-├── raw/
-│   ├── images/
-│   └── metadata.csv
-└── processed/
-    └── index_balanced_skin_lesions.csv
-```
-
-Keeping raw medical images out of version control helps avoid large repository files and supports responsible handling of medical image data.
+Generated data files, downloaded image folders, and model-ready dataset indexes remain outside version control. This keeps the repository lightweight and supports responsible handling of medical image data.
